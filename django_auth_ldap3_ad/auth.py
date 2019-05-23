@@ -65,6 +65,9 @@ class LDAP3ADBackend(object):
     # do we use LDAP Groups?
     use_groups = False
 
+    # do we save user passwords?
+    save_user_passwords = True
+
     def init_and_get_ldap_user(self, username):
         if username is None or username == '':
             return None, None
@@ -99,6 +102,9 @@ class LDAP3ADBackend(object):
             authentication = getattr(settings, 'LDAP_AUTHENTICATION')
         else:
             authentication = SIMPLE
+
+        if hasattr(settings, 'LDAP_SAVE_USER_PWD') and isinstance(settings.LDAP_SAVE_USER_PWD, bool):
+            LDAP3ADBackend.save_user_passwords = settings.LDAP_SAVE_USER_PWD
 
         # first: build server pool from settings
         if LDAP3ADBackend.pool is None:
@@ -167,7 +173,10 @@ class LDAP3ADBackend(object):
 
                 # update existing or new user with LDAP data
                 self.update_user(usr, user_attribs)
-                usr.set_password(password)
+                if LDAP3ADBackend.save_user_passwords:
+                    usr.set_password(password)
+                else:
+                    usr.set_unusable_password()
                 usr.last_login = datetime.now()
                 usr.save()
 

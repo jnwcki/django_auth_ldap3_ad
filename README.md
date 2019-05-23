@@ -208,6 +208,15 @@ Mandatory parameter to tell django to use this module as it's authentication bac
 AUTHENTICATION_BACKENDS = ("django_auth_ldap3_ad.auth.LDAP3ADBackend",)
 ```
 
+### Disable Saving User Passwords
+
+LDAP user passwords are saved in Django by default. You can change this to set an unusable password in Django and force 
+the user to be re-authenticated against LDAP with each login. 
+
+```python
+LDAP_SAVE_USER_PWD = False
+```
+
 ### NEW in 1.6 series:
 
 This auth module now comes with helpers to create a user in the Active Directory, update the password of the user, update the attributes of a user.
